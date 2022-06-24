@@ -1,0 +1,45 @@
+.App {
+  text-align: center;
+  font-family: 'Maven Pro', sans-serif;
+}
+
+.top-bar {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 20px;
+  background-color: #ecfcff;
+}
+
+.logo-img {
+  width: 10rem;
+  margin-left: 10%;
+  margin-top: 10px;
+}
+
+@media (max-device-width: 480px){
+  
+  .top-bar {
+    text-align: center;
+  }
+
+  .logo-img {
+    margin-left: 0px;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
