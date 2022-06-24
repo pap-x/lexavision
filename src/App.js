@@ -5,14 +5,14 @@ import Settings from './components/settings/Settings';
 import Language from './components/language/Language';
 import Camera from './components/camera/Camera'
 import Browse from './components/browse/Browse';
+import Image from './components/image/Image';
 
 function App() {
 
   const [sourceType, setSourceType] = React.useState('document');
   const [from, setFrom] = React.useState('');
   const [to, setTo] = React.useState('');
-
-  const inputFile = React.useRef(null); 
+  const [image, setImage] = React.useState(''); 
 
   const handleSourceType = (event, newSourceType) => {
     setSourceType(newSourceType);
@@ -26,6 +26,14 @@ function App() {
     setTo(event.target.value);
   };
 
+  const handleImage = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      setImage(URL.createObjectURL(event.target.files[0]));
+
+      //call API instantly
+    }
+  };
+
   return (
     <div className="App">
       <div className="top-bar">
@@ -37,8 +45,9 @@ function App() {
       </div>
       <div className="controls">
         <Camera />
-        <Browse inputFile={inputFile}/>
+        <Browse handleImage={handleImage}/>
       </div>
+      <Image image={image}/>
     </div>
   );
 }
