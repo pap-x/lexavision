@@ -6,6 +6,7 @@ import Language from './components/language/Language';
 import Camera from './components/camera/Camera'
 import Browse from './components/browse/Browse';
 import Image from './components/image/Image';
+import Translation from './components/translation/Translation';
 import config from './config';
 
 function App() {
@@ -13,7 +14,8 @@ function App() {
   const [sourceType, setSourceType] = React.useState('document');
   const [from, setFrom] = React.useState('');
   const [to, setTo] = React.useState('');
-  const [image, setImage] = React.useState(''); 
+  const [image, setImage] = React.useState('');
+  const [translation, setTranslation] = React.useState(''); 
 
   //Image to Byte64 converter
   const toBase64 = file => new Promise((resolve, reject) => {
@@ -41,59 +43,101 @@ function App() {
     setTo(event.target.value);
   };
 
-  const handleImage = async (event) => {
+  const handleTranslation = (data) => {
+    setTranslation(data);
+  };
+
+  const imageToText = image => new Promise((resolve, reject) => {
+    //CLARIFAI API call
+    const raw = JSON.stringify({
+      "user_app_id": {
+          "user_id": config.CL_USER_ID,
+          "app_id": config.CL_APP_ID
+      },
+      "inputs": [
+          {
+              "data": {
+                  "image": {
+                      "base64": image
+                  }
+              }
+          }
+      ]
+    });
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Key ' + config.CL_PAT
+        },
+        body: raw
+    };
+
+    //Insert condition for picture or document
+    const MODEL_ID = "f1b1005c8feaa8d3f34d35f224092915";
+
+    fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/outputs", requestOptions)
+        .then(response => response.text())
+        .then(result => {
+          let jsonResult = JSON.parse(result);
+          if (jsonResult.status.description==="Ok") {
+            let raw_text = [];
+            for (let line of jsonResult.outputs[0].data.regions) {
+              raw_text.push(line.data.text.raw);
+            }
+            resolve(raw_text);
+          }
+          else {
+            reject("There was an error with your request!");
+          }
+        })
+        .catch(error => {
+          console.log('error', error);
+          reject(error);
+        });
+  });
+  
+  const translateText = text => new Promise((resolve, reject) => {
+    //DEEPL API call
+    const body = "text="+text+"&source_lang="+"EN"+"&target_lang="+"EL";
+
+    const requestOptions = {
+        method: 'POST',
+        headers: {
+            'Accept': '*/*',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body
+    };
+
+    fetch("https://api-free.deepl.com/v2/translate?auth_key=" + config.DEEPL_KEY, requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        let jsonResult = JSON.parse(result);
+        console.log(jsonResult.translations[0].text);
+        resolve(jsonResult.translations[0].text); 
+      })
+
+      .catch(error => reject(error));
+  })
+
+  const handleImage = (event) => {
     if (event.target.files && event.target.files[0]) {
       setImage(URL.createObjectURL(event.target.files[0]));
       
       try {
-        const base64Image = await toBase64(event.target.files[0]); 
-        console.log(base64Image);
+        
+        //First convert the image to base64 and then use clarifai to convert it to text array before translating it
 
-        //CLARIFAI API call
-        const raw = JSON.stringify({
-          "user_app_id": {
-              "user_id": config.CL_USER_ID,
-              "app_id": config.CL_APP_ID
-          },
-          "inputs": [
-              {
-                  "data": {
-                      "image": {
-                          "base64": base64Image
-                      }
-                  }
-              }
-          ]
-        });
-  
-        const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Authorization': 'Key ' + config.CL_PAT
-            },
-            body: raw
-        };
-
-        //Insert condition for picture or document
-        const MODEL_ID = "f1b1005c8feaa8d3f34d35f224092915";
-  
-        fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/outputs", requestOptions)
-            .then(response => response.text())
-            .then(result => {
-              let jsonResult = JSON.parse(result);
-              if (jsonResult.status.description==="Ok") {
-                let raw_text = "";
-                for (let line of jsonResult.outputs[0].data.regions) {
-                  raw_text += line.data.text.raw + " ";
-                }
-                console.log(raw_text);
-              }
-              else {
-                console.log("There was an error with your request!");
-              }
-            })
-            .catch(error => console.log('error', error));
+        toBase64(event.target.files[0])
+          .then(base64Image => imageToText(base64Image))
+          .then(textArray => {
+            const rawText = textArray.join('\n');
+            translateText(rawText).then(result => handleTranslation(result));
+            //handleTranslation(rawText);
+          })
+          .catch(error=> console.log(error)); 
       }
       catch(error) {
         console.log(error);
@@ -117,6 +161,7 @@ function App() {
       </div>
       <div className="results">
         <Image image={image}/>
+        <Translation translation={translation}/>
       </div>
     </div>
   );

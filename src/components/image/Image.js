@@ -1,6 +1,6 @@
 import './Image.css'
 
-export default function Browse({image}) {
+export default function Image({image}) {
 
   if (image!=='') {
     return (<img src={image} alt="selected image" className="image"/>);
