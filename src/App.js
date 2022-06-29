@@ -15,7 +15,9 @@ function App() {
   const [from, setFrom] = React.useState('');
   const [to, setTo] = React.useState('');
   const [image, setImage] = React.useState('');
+  const [extractedText, setExText] = React.useState('');
   const [translation, setTranslation] = React.useState(''); 
+  const [loadingText, setLoadText] = React.useState(false);
 
   //Image to Byte64 converter
   const toBase64 = file => new Promise((resolve, reject) => {
@@ -44,7 +46,8 @@ function App() {
   };
 
   const handleTranslation = (data) => {
-    setTranslation(data);
+    const text = data.join('\n');
+    setTranslation(text);
   };
 
   const imageToText = image => new Promise((resolve, reject) => {
@@ -86,6 +89,7 @@ function App() {
             for (let line of jsonResult.outputs[0].data.regions) {
               raw_text.push(line.data.text.raw);
             }
+            setExText(raw_text);
             resolve(raw_text);
           }
           else {
@@ -100,7 +104,11 @@ function App() {
   
   const translateText = text => new Promise((resolve, reject) => {
     //DEEPL API call
-    const body = "text="+text+"&source_lang="+"EN"+"&target_lang="+"EL";
+    const combinedText = text.join("&text=");
+    console.log(combinedText);
+    const fromLang = from || '';
+    const toLang = to || 'EL'
+    const body = "text="+combinedText+"&source_lang="+fromLang+"&target_lang="+toLang;
 
     const requestOptions = {
         method: 'POST',
@@ -114,9 +122,10 @@ function App() {
     fetch("https://api-free.deepl.com/v2/translate?auth_key=" + config.DEEPL_KEY, requestOptions)
       .then(response => response.text())
       .then(result => {
-        let jsonResult = JSON.parse(result);
-        console.log(jsonResult.translations[0].text);
-        resolve(jsonResult.translations[0].text); 
+        const jsonResult = JSON.parse(result);
+        const textArray = jsonResult.translations.map(line => line.text);
+
+        resolve(textArray); 
       })
 
       .catch(error => reject(error));
@@ -124,6 +133,7 @@ function App() {
 
   const handleImage = (event) => {
     if (event.target.files && event.target.files[0]) {
+      setLoadText(true);
       setImage(URL.createObjectURL(event.target.files[0]));
       
       try {
@@ -132,10 +142,10 @@ function App() {
 
         toBase64(event.target.files[0])
           .then(base64Image => imageToText(base64Image))
-          .then(textArray => {
-            const rawText = textArray.join('\n');
-            translateText(rawText).then(result => handleTranslation(result));
-            //handleTranslation(rawText);
+          .then(textArray => translateText(textArray))
+          .then(translation => {
+            handleTranslation(translation)
+            setLoadText(false);
           })
           .catch(error=> console.log(error)); 
       }
@@ -160,7 +170,7 @@ function App() {
         <Browse handleImage={handleImage}/>
       </div>
       <div className="results">
-        <Image image={image}/>
+        <Image image={image} loadingText={loadingText}/>
         <Translation translation={translation}/>
       </div>
     </div>

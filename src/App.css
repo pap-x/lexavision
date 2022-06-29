@@ -16,17 +16,6 @@
   margin-top: 10px;
 }
 
-@media (max-device-width: 480px){
-  
-  .top-bar {
-    text-align: center;
-  }
-
-  .logo-img {
-    margin-left: 0px;
-  }
-}
-
 .main {
   display: flex;
   flex-direction: row;
@@ -47,6 +36,26 @@
 .results {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  width: 90%;
   justify-content: center;
+  margin-top: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  gap: 5px;
 }
+
+@media (max-device-width: 480px){
+  
+  .top-bar {
+    text-align: center;
+  }
+
+  .logo-img {
+    margin-left: 0px;
+  }
+
+  .results {
+    flex-direction: column;
+  }
+}
+

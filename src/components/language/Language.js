@@ -7,8 +7,16 @@ import './Language.css'
 
 export default function Language({from, handleFrom, to, handleTo}) {
 
-    const languages = ['English', 'German', 'Spanish', 'French', 'Greek'];
-
+    const languages = [{text: 'English', symbol: 'EN'},
+                        {text: 'German', symbol: 'DE'},
+                        {text: 'French', symbol: 'FR'},
+                        {text: 'Spanish', symbol: 'ES'},
+                        {text: 'Chinese', symbol: 'ZH'},
+                        {text: 'Dutch', symbol: 'NL'},
+                        {text: 'Japanese', symbol: 'JA'},
+                        {text: 'Italian', symbol: 'IT'},
+                        {text: 'Russian', symbol: 'RU'},
+                        {text: 'Greek', symbol: 'EL'}]
     return (
         <div className="Language">
             <FormControl sx={{ m: 1, minWidth: 120 }}>
@@ -22,10 +30,10 @@ export default function Language({from, handleFrom, to, handleTo}) {
 
                 {languages.map((lang, i) => {
                     if (lang===to) {
-                        return <MenuItem disabled key={i} value={lang}>{lang}</MenuItem>
+                        return <MenuItem disabled key={i} value={lang.symbol}>{lang.text}</MenuItem>
                     }
                     else {
-                        return <MenuItem key={i} value={lang}>{lang}</MenuItem>
+                        return <MenuItem key={i} value={lang.symbol}>{lang.text}</MenuItem>
                     }
                 })}
                 </Select>
@@ -42,10 +50,10 @@ export default function Language({from, handleFrom, to, handleTo}) {
 
                 {languages.map((lang, i) => {
                     if (lang===from) {
-                        return <MenuItem disabled key={i} value={lang}>{lang}</MenuItem>
+                        return <MenuItem disabled key={i} value={lang.symbol}>{lang.text}</MenuItem>
                     }
                     else {
-                        return <MenuItem key={i} value={lang}>{lang}</MenuItem>
+                        return <MenuItem key={i} value={lang.symbol}>{lang.text}</MenuItem>
                     }
                 })}
                 </Select>

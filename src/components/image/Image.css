@@ -1,4 +1,42 @@
-.image {
+.image-el {
     max-width: 100%;
-    max-height: 50vh; 
+    max-height: 50vh;
+}
+
+.Image-load {
+    position: relative;
+}
+
+.Image-load::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    background: #15a9c0;
+    box-shadow: 0 0 70px 20px #15a9c0;
+    clip-path: inset(0);
+    animation:
+        x 1s ease-in-out infinite alternate,
+        y 2s   ease-in-out infinite;
+}
+
+@keyframes x {
+    to {
+        transform: translateX(-100%);
+        left: 100%;
+    }
+}
+
+@keyframes y {
+    33% {
+        clip-path: inset(0 0 0 -100px);    
+    }
+    50% {
+        clip-path: inset(0 0 0 0);    
+    }
+    83%{
+        clip-path: inset(0 -100px 0 0); 
+    }
 }
