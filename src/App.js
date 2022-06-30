@@ -1,7 +1,6 @@
 import * as React from 'react';
 import logo from './assets/images/logo.png';
 import './App.css';
-import Settings from './components/settings/Settings';
 import Language from './components/language/Language';
 import Camera from './components/camera/Camera'
 import Browse from './components/browse/Browse';
@@ -11,8 +10,7 @@ import config from './config';
 
 function App() {
 
-  const [sourceType, setSourceType] = React.useState('document');
-  const [from, setFrom] = React.useState('');
+  const [from, setFrom] = React.useState('auto');
   const [to, setTo] = React.useState('');
   const [image, setImage] = React.useState('');
   const [extractedText, setExText] = React.useState('');
@@ -32,10 +30,6 @@ function App() {
       }
       reader.onerror = error => reject(error);
   });
-  
-  const handleSourceType = (event, newSourceType) => {
-    setSourceType(newSourceType);
-  };
 
   const handleFrom = (event) => {
     setFrom(event.target.value);
@@ -43,6 +37,13 @@ function App() {
 
   const handleTo = (event) => {
     setTo(event.target.value);
+
+    //If we have already extracted text from the image, translate it to the selected language
+    if (extractedText) {
+      translateText(extractedText)
+        .then(translation => handleTranslation(translation))
+        .catch(error=> console.log(error)); 
+    }
   };
 
   const handleTranslation = (data) => {
@@ -78,7 +79,7 @@ function App() {
     };
 
     //Insert condition for picture or document
-    const MODEL_ID = "f1b1005c8feaa8d3f34d35f224092915";
+    const MODEL_ID = "language-aware-multilingual-ocr-multiplex";
 
     fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/outputs", requestOptions)
         .then(response => response.text())
@@ -105,8 +106,9 @@ function App() {
   const translateText = text => new Promise((resolve, reject) => {
     //DEEPL API call
     const combinedText = text.join("&text=");
-    console.log(combinedText);
-    const fromLang = from || '';
+    
+    const fromLang = (from==='auto') ? '' : from;
+
     const toLang = to || 'EL'
     const body = "text="+combinedText+"&source_lang="+fromLang+"&target_lang="+toLang;
 
@@ -142,9 +144,18 @@ function App() {
 
         toBase64(event.target.files[0])
           .then(base64Image => imageToText(base64Image))
-          .then(textArray => translateText(textArray))
+          .then(textArray => {
+            // If to language is selected then translate, else don't
+            console.log(textArray);
+            if (to) {
+              return translateText(textArray) 
+            } else {
+              return textArray;
+            } 
+          })
           .then(translation => {
-            handleTranslation(translation)
+            console.log(translation);
+            handleTranslation(translation);
             setLoadText(false);
           })
           .catch(error=> console.log(error)); 
@@ -162,7 +173,6 @@ function App() {
         <img src={logo} alt='Lexavision' className="logo-img"/>
       </div>
       <div className="main">
-        <Settings sourceType={sourceType} handleSourceType={handleSourceType}/>
         <Language from={from} handleFrom={handleFrom} to={to} handleTo={handleTo}/>
       </div>
       <div className="controls">

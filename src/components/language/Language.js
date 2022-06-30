@@ -23,11 +23,12 @@ export default function Language({from, handleFrom, to, handleTo}) {
                 <InputLabel id="from-label">From</InputLabel>
                 <Select
                 labelId="from-label"
+                defaultValue={"auto"}
                 id="from"
                 value={from}
                 label="From"
                 onChange={handleFrom}>
-
+                <MenuItem key="auto" value="auto"><b>Auto</b></MenuItem>
                 {languages.map((lang, i) => {
                     if (lang===to) {
                         return <MenuItem disabled key={i} value={lang.symbol}>{lang.text}</MenuItem>
