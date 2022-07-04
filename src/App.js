@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './assets/images/logo.png';
 import './App.css';
 import Language from './components/language/Language';
@@ -10,12 +10,12 @@ import config from './config';
 
 function App() {
 
-  const [from, setFrom] = React.useState('auto');
-  const [to, setTo] = React.useState('');
-  const [image, setImage] = React.useState('');
-  const [extractedText, setExText] = React.useState('');
-  const [translation, setTranslation] = React.useState(''); 
-  const [loadingText, setLoadText] = React.useState(false);
+  const [from, setFrom] = useState('auto');
+  const [to, setTo] = useState('');
+  const [image, setImage] = useState('');
+  const [extractedText, setExText] = useState('');
+  const [translation, setTranslation] = useState(''); 
+  const [loadingText, setLoadText] = useState(false);
 
   //Image to Byte64 converter
   const toBase64 = file => new Promise((resolve, reject) => {
@@ -37,14 +37,16 @@ function App() {
 
   const handleTo = (event) => {
     setTo(event.target.value);
+  };
 
-    //If we have already extracted text from the image, translate it to the selected language
+  useEffect(()=>{ 
+     //If we have already extracted text from the image, translate it to the selected language
     if (extractedText) {
       translateText(extractedText)
         .then(translation => handleTranslation(translation))
         .catch(error=> console.log(error)); 
     }
-  };
+  }, [to]);
 
   const handleTranslation = (data) => {
     const text = data.join('\n');
@@ -171,12 +173,14 @@ function App() {
     <div className="App">
       <div className="top-bar">
         <img src={logo} alt='Lexavision' className="logo-img"/>
+        <span className="desc-text">[ Image translation made easy! ]</span>
+        <div className="whitespace"></div>
       </div>
       <div className="main">
         <Language from={from} handleFrom={handleFrom} to={to} handleTo={handleTo}/>
       </div>
       <div className="controls">
-        <Camera />
+        <Camera handleImage={handleImage}/>
         <Browse handleImage={handleImage}/>
       </div>
       <div className="results">
