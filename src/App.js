@@ -6,7 +6,6 @@ import Camera from './components/camera/Camera'
 import Browse from './components/browse/Browse';
 import Image from './components/image/Image';
 import Translation from './components/translation/Translation';
-import config from './config';
 
 function App() {
 
@@ -57,8 +56,8 @@ function App() {
     //CLARIFAI API call
     const raw = JSON.stringify({
       "user_app_id": {
-          "user_id": config.CL_USER_ID,
-          "app_id": config.CL_APP_ID
+          "user_id": process.env.REACT_APP_CL_USER_ID,
+          "app_id": process.env.REACT_APP_CL_APP_ID
       },
       "inputs": [
           {
@@ -75,7 +74,7 @@ function App() {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
-            'Authorization': 'Key ' + config.CL_PAT
+            'Authorization': 'Key ' + process.env.REACT_APP_CL_PAT
         },
         body: raw
     };
@@ -123,7 +122,7 @@ function App() {
         body: body
     };
 
-    fetch("https://api-free.deepl.com/v2/translate?auth_key=" + config.DEEPL_KEY, requestOptions)
+    fetch("https://api-free.deepl.com/v2/translate?auth_key=" + process.env.REACT_APP_DEEPL_KEY, requestOptions)
       .then(response => response.text())
       .then(result => {
         const jsonResult = JSON.parse(result);

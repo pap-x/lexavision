@@ -17,8 +17,8 @@
 .env.development.local
 .env.test.local
 .env.production.local
-/src/config.js
-/reactcert
+.env
+
 
 npm-debug.log*
 yarn-debug.log*
