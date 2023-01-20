@@ -16,6 +16,10 @@ function App() {
   const [translation, setTranslation] = useState(''); 
   const [loadingText, setLoadText] = useState(false);
 
+  const optiic = new (require('optiic'))({
+    apiKey: "test"
+  });
+
   //Image to Byte64 converter
   const toBase64 = file => new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -48,65 +52,28 @@ function App() {
   }, [to]);
 
   const handleTranslation = (data) => {
-    const text = data.join('\n');
+    const text = data;  //.join('\n');
     setTranslation(text);
   };
 
   const imageToText = image => new Promise((resolve, reject) => {
-    //CLARIFAI API call
-    const raw = JSON.stringify({
-      "user_app_id": {
-          "user_id": process.env.REACT_APP_CL_USER_ID,
-          "app_id": process.env.REACT_APP_CL_APP_ID
-      },
-      "inputs": [
-          {
-              "data": {
-                  "image": {
-                      "base64": image
-                  }
-              }
-          }
-      ]
+    optiic.process({
+      url: image
+    })
+    .then(response => {
+      console.log(response);
+      setExText(response.text);
+      resolve(response.text);
+    })
+    .catch(error => {
+      console.log('error', error);
+      reject(error);
     });
-
-    const requestOptions = {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Authorization': 'Key ' + process.env.REACT_APP_CL_PAT
-        },
-        body: raw
-    };
-
-    //Insert condition for picture or document
-    const MODEL_ID = "language-aware-multilingual-ocr-multiplex";
-
-    fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/outputs", requestOptions)
-        .then(response => response.text())
-        .then(result => {
-          let jsonResult = JSON.parse(result);
-          if (jsonResult.status.description==="Ok") {
-            let raw_text = [];
-            for (let line of jsonResult.outputs[0].data.regions) {
-              raw_text.push(line.data.text.raw);
-            }
-            setExText(raw_text);
-            resolve(raw_text);
-          }
-          else {
-            reject("There was an error with your request!");
-          }
-        })
-        .catch(error => {
-          console.log('error', error);
-          reject(error);
-        });
   });
   
   const translateText = text => new Promise((resolve, reject) => {
     //DEEPL API call
-    const combinedText = text.join("&text=");
+    const combinedText = text;  //.join("&text=");
     
     const fromLang = (from==='auto') ? '' : from;
 
@@ -140,19 +107,11 @@ function App() {
       setImage(URL.createObjectURL(event.target.files[0]));
       
       try {
-        
-        //First convert the image to base64 and then use clarifai to convert it to text array before translating it
-
-        toBase64(event.target.files[0])
-          .then(base64Image => imageToText(base64Image))
-          .then(textArray => {
+        //Use optiic to convert to text and then if language is selected, translate it
+          imageToText(event.target)
+          .then(originalText => {
             // If to language is selected then translate, else don't
-            console.log(textArray);
-            if (to) {
-              return translateText(textArray) 
-            } else {
-              return textArray;
-            } 
+            return (to ? translateText(originalText) : originalText);
           })
           .then(translation => {
             console.log(translation);
@@ -161,6 +120,7 @@ function App() {
           })
           .catch(error=> console.log(error)); 
       }
+      
       catch(error) {
         console.log(error);
       }
@@ -179,7 +139,7 @@ function App() {
         <Language from={from} handleFrom={handleFrom} to={to} handleTo={handleTo}/>
       </div>
       <div className="controls">
-        <Camera handleImage={handleImage}/>
+        <Camera handleImage={handleImage} optiic={optiic}/>
         <Browse handleImage={handleImage}/>
       </div>
       <div className="results">

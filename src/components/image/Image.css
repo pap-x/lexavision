@@ -7,6 +7,10 @@
     position: relative;
 }
 
+.Image {
+    flex: 1;
+}
+
 .Image-load::before {
     content: "";
     position: absolute;

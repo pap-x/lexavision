@@ -1,11 +1,12 @@
 .Translation {
-    border: 1px solid grey;
-    border-radius: 10px;
-    padding: 10px;
     min-width: 25%;
+    flex: 1;
 }
 
 .translation-text {
     white-space: pre-line;
     text-align: left;
+    border: 1px solid grey;
+    border-radius: 10px;
+    padding: 10px;
 }

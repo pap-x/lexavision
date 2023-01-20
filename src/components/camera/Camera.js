@@ -12,6 +12,7 @@ export default function Camera({handleImage}) {
     inputFile.current.click();
   };
 
+
   return (
     <div className="Camera">
       <input type="file" id='file' ref={inputFile} style={{display: 'none'}} accept="image/*" capture="environment" onChange={handleImage}/>
