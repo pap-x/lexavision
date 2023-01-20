@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/lexavision/static/css/main.b483d31d.css",
-    "main.js": "/lexavision/static/js/main.1db558c9.js",
+    "main.css": "/lexavision/static/css/main.8fc23d5e.css",
+    "main.js": "/lexavision/static/js/main.45f4350a.js",
     "static/js/787.3474513f.chunk.js": "/lexavision/static/js/787.3474513f.chunk.js",
     "static/media/logo.png": "/lexavision/static/media/logo.41fb80d04fee4b10c91e.png",
     "index.html": "/lexavision/index.html",
-    "main.b483d31d.css.map": "/lexavision/static/css/main.b483d31d.css.map",
-    "main.1db558c9.js.map": "/lexavision/static/js/main.1db558c9.js.map",
+    "main.8fc23d5e.css.map": "/lexavision/static/css/main.8fc23d5e.css.map",
+    "main.45f4350a.js.map": "/lexavision/static/js/main.45f4350a.js.map",
     "787.3474513f.chunk.js.map": "/lexavision/static/js/787.3474513f.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b483d31d.css",
-    "static/js/main.1db558c9.js"
+    "static/css/main.8fc23d5e.css",
+    "static/js/main.45f4350a.js"
   ]
 }
