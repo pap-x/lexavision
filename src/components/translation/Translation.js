@@ -2,14 +2,10 @@ import './Translation.css'
 
 export default function Translation({translation}) {
 
-    if (translation!=='') {
-        return (
-            <div className="Translation">
-                <div className="translation-text">{translation}</div>
-            </div>
-        );
-    }
-    else {
-        return null;
-    }
+    return (
+        <div className="Translation">
+            {(translation!=='') && <div className="translation-text">{translation}</div>}
+        </div>
+    );
+
 }

@@ -66,6 +66,8 @@ function App() {
       resolve(response.text);
     })
     .catch(error => {
+      setLoadText(false);
+      setTranslation('API limit reached!');
       console.log('error', error);
       reject(error);
     });
@@ -74,6 +76,8 @@ function App() {
   const translateText = text => new Promise((resolve, reject) => {
     //DEEPL API call
     const combinedText = text;  //.join("&text=");
+    console.log('Start Text');
+    console.log(text);
     
     const fromLang = (from==='auto') ? '' : from;
 
@@ -92,8 +96,15 @@ function App() {
     fetch("https://api-free.deepl.com/v2/translate?auth_key=" + process.env.REACT_APP_DEEPL_KEY, requestOptions)
       .then(response => response.text())
       .then(result => {
+
+        console.log('Return Text');
+        console.log(result);
+
         const jsonResult = JSON.parse(result);
         const textArray = jsonResult.translations.map(line => line.text);
+
+        console.log('Return Text');
+        console.log(textArray);
 
         resolve(textArray); 
       })
